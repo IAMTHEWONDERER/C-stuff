@@ -1,20 +1,33 @@
 #include <gtk/gtk.h>
 
 static void
+// Function that gets called when the GTK application is activated
+// Takes two parameters: the GtkApplication pointer and user data (unused here)
 activate (GtkApplication* app,
           gpointer        user_data)
 {
-GtkWidget *window;
-GtkWidget *label;
+    // Declare widget pointers for our window and label
+    GtkWidget *window;
+    GtkWidget *label;
 
-window = gtk_application_window_new(app);
-gtk_window_set_default_size(GTK_WINDOW(window), 200, 100); // Set window size
-gtk_window_set_title(GTK_WINDOW(window), "My Calculator"); // Set window title
+    // Create a new application window associated with our app
+    window = gtk_application_window_new(app);
+    
+    // Set the initial window size to 200px width and 100px height
+    gtk_window_set_default_size(GTK_WINDOW(window), 200, 100);
+    
+    // Set the title that appears in the window's title bar
+    gtk_window_set_title(GTK_WINDOW(window), "My Calculator");
 
-label = gtk_label_new("Hello World");
-gtk_container_add(GTK_CONTAINER(window), label); // Add label to window
+    // Create a new label widget with the text "Hello World"
+    label = gtk_label_new("Hello World");
+    
+    // Add the label widget as a child of the window container
+    // GTK_CONTAINER casting is needed to use container functions
+    gtk_container_add(GTK_CONTAINER(window), label);
 
-gtk_widget_show_all(window); // Show all widgets including the label
+    // Make the window and all its child widgets (the label) visible
+    gtk_widget_show_all(window);
 }
 
 // This is the main function - the entry point of our program
