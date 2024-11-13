@@ -1,0 +1,21 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build-calculator",
+            "type": "shell",
+            "command": "gcc",
+            "args": [
+                "calculator.c",
+                "-o",
+                "calculator",
+                "-mms-bitfields",
+                "${command:pkg-config} --cflags --libs gtk+-3.0"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
