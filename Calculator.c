@@ -21,8 +21,7 @@ static gboolean on_entry_key_press(GtkWidget *entry, GdkEventKey *event, gpointe
     return FALSE; // Allow other key events to propagate
 }
 
-// Finished static void function that handles the button click event
-
+// Activate function
 static void activate(GtkApplication *app, gpointer user_data) {
     GtkWidget *window;
     GtkWidget *box;
@@ -43,8 +42,6 @@ static void activate(GtkApplication *app, gpointer user_data) {
     entry = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(entry), "ENTER TEXT PLEASE");
     gtk_box_pack_start(GTK_BOX(box), entry, TRUE, TRUE, 0);
-    // In here false false or true true, are there for expand and fill, padding is the number, so either we
-    // expand and fill or not, and padding is the number of pixels to pad the widget with
 
     // Create the label widget
     label = gtk_label_new("OUTPUT");
@@ -65,6 +62,7 @@ static void activate(GtkApplication *app, gpointer user_data) {
     gtk_widget_show_all(window);
 }
 
+// Main function
 int main(int argc, char **argv) {
     GtkApplication *app;
     int status;
