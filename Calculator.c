@@ -1,66 +1,76 @@
 #include <gtk/gtk.h>
+#include <stdio.h>
 
-static void
-// Function that gets called when the GTK application is activated
-// Takes two parameters: the GtkApplication pointer and user data (unused here)
-activate (GtkApplication* app,
-          gpointer        user_data)
-{
-    // Declare widget pointers for our window and label
+// Function that handles the button click event
+static void on_button_clicked(GtkWidget *button, gpointer data) {
+    GtkWidget *entry = GTK_WIDGET(data);
+    const char *input_text = gtk_entry_get_text(GTK_ENTRY(entry));
+    g_print("Button clicked: %s\n", input_text);
+    GtkWidget *label = g_object_get_data(G_OBJECT(button), "label");
+    gtk_label_set_text(GTK_LABEL(label), input_text);
+}
+
+// Function that handles the Enter key press event
+static gboolean on_entry_key_press(GtkWidget *entry, GdkEventKey *event, gpointer data) {
+    // Check if the pressed key is Enter
+    if (event->keyval == GDK_KEY_Return || event->keyval == GDK_KEY_KP_Enter) {
+        GtkWidget *button = GTK_WIDGET(data);
+        g_signal_emit_by_name(button, "clicked"); // Simulate button click
+        return TRUE; // Stop further handling of the key event
+    }
+    return FALSE; // Allow other key events to propagate
+}
+
+// Finished static void function that handles the button click event
+
+static void activate(GtkApplication *app, gpointer user_data) {
     GtkWidget *window;
+    GtkWidget *box;
+    GtkWidget *entry;
     GtkWidget *label;
+    GtkWidget *button;
 
-    // Create a new application window associated with our app
+    // Create main window
     window = gtk_application_window_new(app);
-    
-    // Set the initial window size to 200px width and 100px height
-    gtk_window_set_default_size(GTK_WINDOW(window), 200, 100);
-    
-    // Set the title that appears in the window's title bar
-    gtk_window_set_title(GTK_WINDOW(window), "My Calculator");
+    gtk_window_set_title(GTK_WINDOW(window), "INPUT AND OUTPUT");
+    gtk_window_set_default_size(GTK_WINDOW(window), 500, 500);
 
-    // Create a new label widget with the text "Hello World"
-    label = gtk_label_new("Hello World");
-    
-    // Add the label widget as a child of the window container
-    // GTK_CONTAINER casting is needed to use container functions
-    gtk_container_add(GTK_CONTAINER(window), label);
+    // Create a vertical box layout
+    box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
+    gtk_container_add(GTK_CONTAINER(window), box);
 
-    // Make the window and all its child widgets (the label) visible
+    // Create the entry widget
+    entry = gtk_entry_new();
+    gtk_entry_set_placeholder_text(GTK_ENTRY(entry), "ENTER TEXT PLEASE");
+    gtk_box_pack_start(GTK_BOX(box), entry, TRUE, TRUE, 0);
+    // In here false false or true true, are there for expand and fill, padding is the number, so either we
+    // expand and fill or not, and padding is the number of pixels to pad the widget with
+
+    // Create the label widget
+    label = gtk_label_new("OUTPUT");
+    gtk_box_pack_start(GTK_BOX(box), label, TRUE, TRUE, 0);
+
+    // Create the button widget
+    button = gtk_button_new_with_label("CLICK ME");
+    gtk_box_pack_start(GTK_BOX(box), button, TRUE, TRUE, 0);
+
+    // Link the button and label for the click event
+    g_object_set_data(G_OBJECT(button), "label", label);
+    g_signal_connect(button, "clicked", G_CALLBACK(on_button_clicked), entry);
+
+    // Connect the entry key press event to the Enter handler
+    g_signal_connect(entry, "key-press-event", G_CALLBACK(on_entry_key_press), button);
+
+    // Show all widgets
     gtk_widget_show_all(window);
 }
 
-// This is the main function - the entry point of our program
-// argc: counts how many arguments were passed when running the program
-// argv: array of strings containing those arguments
-int
-main (int    argc,
-      char **argv)
-{
-    // Declare a pointer to store our GTK application
+int main(int argc, char **argv) {
     GtkApplication *app;
-    // Variable to store the exit status of our program
     int status;
-
-    // Create a new GTK application
-    // "org.gtk.example" is the application ID (like a unique name)
-    // G_APPLICATION_DEFAULT_FLAGS means use normal default settings
-    app = gtk_application_new ("org.gtk.example", G_APPLICATION_DEFAULT_FLAGS);
-
-    // Connect a signal (like an event listener)
-    // When the app is "activated" (started), run the function named 'activate'
-    // G_CALLBACK is used to convert the function into the right format
-    // NULL means we're not passing any extra data to the activate function
-    g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
-
-    // Actually run the application
-    // G_APPLICATION(app) converts our GTK app into a basic application type
-    // Returns an exit status code (0 usually means success)
-    status = g_application_run (G_APPLICATION (app), argc, argv);
-
-    // Clean up the memory used by our app
-    g_object_unref (app);
-
-    // Return the status code to the operating system
+    app = gtk_application_new("org.gtk.example", G_APPLICATION_DEFAULT_FLAGS);
+    g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
+    status = g_application_run(G_APPLICATION(app), argc, argv);
+    g_object_unref(app);
     return status;
 }
